@@ -1,0 +1,545 @@
+#
+
+###########     NOTE: may need to change 'lr_mult' for MaskNet and #########
+###########	      'num_output' for fc6 and center_loss and     ###############
+###########	      'name' for fc6 and center_loss               ##########
+
+name: "prelu-center"
+layer {
+  name: "data"
+  type: "ImageData"
+  top: "data"
+  top: "label"
+  include { 
+    phase: TRAIN
+  }
+  transform_param {
+    mean_value: 127.5
+    mean_value: 127.5
+    mean_value: 127.5
+    scale: 0.0078125
+    mirror: true
+  }
+  image_data_param {
+    root_folder: "/media/wwt/860G/data/"
+    source: "face_example/data/train_AR_JNC.txt"
+    batch_size: 160
+    shuffle: true
+    is_color: true
+  }
+}
+## test unused for now
+layer {
+  name: "data"
+  type: "ImageData"
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+  }
+  transform_param {
+    mean_value: 127.5
+    mean_value: 127.5
+    mean_value: 127.5
+    scale: 0.0078125
+    mirror: true
+  }
+  image_data_param {
+    root_folder: "/media/wwt/860G/data/"
+    source: "face_example/data/val_CASIA_aligned.txt"
+    batch_size: 141
+  }
+}
+
+### CNN ###
+# MaskNet
+layer {
+  name: "mask_conv1"
+  type: "Convolution"
+  bottom: "data"
+  top: "mask_conv1"
+  param {
+    name: "mask_conv1_w"
+    lr_mult: 0
+  }
+  param {
+    name: "mask_conv1_b"
+    lr_mult: 0
+  }
+  convolution_param {
+    num_output: 64
+    kernel_size: 5
+    stride: 1
+    pad: 2
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "mask_relu1"
+  type: "PReLU"
+  bottom: "mask_conv1"
+  top: "mask_conv1"
+}
+
+layer {
+  name: "mask_conv2"
+  type: "Convolution"
+  bottom: "mask_conv1"
+  top: "mask_conv2"
+  param {
+    name: "mask_conv2_w"
+    lr_mult: 0
+  }
+  param {
+    name: "mask_conv2_b"
+    lr_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    kernel_size: 3
+    stride: 1
+    pad: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "mask_relu2"
+  type: "PReLU"
+  bottom: "mask_conv2"
+  top: "mask_conv2"
+}
+
+layer {
+  name: "mask_conv3"
+  type: "Convolution"
+  bottom: "mask_conv2"
+  top: "mask_conv3"
+  param {
+    name: "mask_conv3_w"
+    lr_mult: 0
+  }
+  param {
+    name: "mask_conv3_b"
+    lr_mult: 0
+  }
+  convolution_param {
+    num_output: 3
+    kernel_size: 3
+    stride: 1
+    pad: 1
+    weight_filler {
+      type: "constant"
+      value: 0
+    }
+    bias_filler {
+      type: "constant"
+      value: 1
+    }
+  }
+}
+layer {
+  name: "sig3"
+  bottom: "mask_conv3"
+  top: "mask_conv3"
+  type: "Sigmoid"
+}
+layer {
+  name: "mask"
+  type: "Eltwise"
+  bottom: "data"
+  bottom: "mask_conv3"
+  top: "mask_data"
+  eltwise_param {
+    operation: PROD
+  }
+}
+
+# DeepidNet
+layer {
+  name: "conv11"
+  type: "Convolution"
+  bottom: "mask_data"
+  top: "conv11"
+  param {
+    name: "conv11_w"
+    lr_mult: 1
+  }
+  param {
+    name: "conv11_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 32
+    kernel_size: 5
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "conv12"
+  type: "Convolution"
+  bottom: "mask_data"
+  top: "conv12"
+  param {
+    name: "conv12_w"
+    lr_mult: 1
+  }
+  param {
+    name: "conv12_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 32
+    kernel_size: 5
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "max1"
+  type: "Eltwise"
+  bottom: "conv11"
+  bottom: "conv12"
+  top: "conv1"
+  eltwise_param {
+    operation: MAX
+  }
+}
+layer{
+  name: "relu1"
+  type: "PReLU"
+  bottom: "conv1"
+  top: "conv1"
+}
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "conv1"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "conv21"
+  type: "Convolution"
+  bottom: "pool1"
+  top: "conv21"
+  param {
+    name: "conv21_w"
+    lr_mult: 1
+  }
+  param {
+    name: "conv21_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 64
+    kernel_size: 5
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "conv22"
+  type: "Convolution"
+  bottom: "pool1"
+  top: "conv22"
+  param {
+    name: "conv22_w"
+    lr_mult: 1
+  }
+  param {
+    name: "conv22_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 64
+    kernel_size: 5
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "max2"
+  type: "Eltwise"
+  bottom: "conv21"
+  bottom: "conv22"
+  top: "conv2"
+  eltwise_param {
+    operation: MAX
+  }
+}
+layer{
+  name: "relu2"
+  type: "PReLU"
+  bottom: "conv2"
+  top: "conv2"
+}
+layer {
+  name: "pool2"
+  type: "Pooling"
+  bottom: "conv2"
+  top: "pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "conv31"
+  type: "Convolution"
+  bottom: "pool2"
+  top: "conv31"
+  param {
+    name: "conv31_w"
+    lr_mult: 1
+  }
+  param {
+    name: "conv31_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 128
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "conv32"
+  type: "Convolution"
+  bottom: "pool2"
+  top: "conv32"
+  param {
+    name: "conv32_w"
+    lr_mult: 1
+  }
+  param {
+    name: "conv32_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 128
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "max3"
+  type: "Eltwise"
+  bottom: "conv31"
+  bottom: "conv32"
+  top: "conv3"
+  eltwise_param {
+    operation: MAX
+  }
+}
+
+layer{
+  name: "relu3"
+  type: "PReLU"
+  bottom: "conv3"
+  top: "conv3"
+}
+
+layer {
+  name: "pool3"
+  type: "Pooling"
+  bottom: "conv3"
+  top: "pool3"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+
+layer {
+  name: "conv41"
+  type: "Convolution"
+  bottom: "pool3"
+  top: "conv41"
+  param {
+    name: "conv41_w"
+    lr_mult: 1
+  }
+  param {
+    name: "conv41_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 256
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "conv42"
+  type: "Convolution"
+  bottom: "pool3"
+  top: "conv42"
+  param {
+    name: "conv42_w"
+    lr_mult: 1
+  }
+  param {
+    name: "conv42_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 256
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "max4"
+  type: "Eltwise"
+  bottom: "conv41"
+  bottom: "conv42"
+  top: "conv4"
+  eltwise_param {
+    operation: MAX
+  }
+}
+layer{
+  name: "relu4"
+  type: "PReLU"
+  bottom: "conv4"
+  top: "conv4"
+}
+
+layer {
+  name: "fc5"
+  type: "InnerProduct"
+  bottom: "conv4"
+  top: "fc5"
+  param {
+    name: "ip1_w"
+    lr_mult: 1
+  }
+  param {
+    name: "ip1_b"
+    lr_mult: 2
+  }
+  inner_product_param {
+    num_output: 512
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+
+############## softmax loss ###############
+layer {
+  name: "fc6AR"
+  type: "InnerProduct"
+  bottom: "fc5"
+  top: "fc6"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 15 # 10575	
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "softmax_loss"
+  type: "SoftmaxWithLoss"
+  bottom: "fc6"
+  bottom: "label"
+  top: "softmax_loss"
+}
+############## center loss ###############
+layer {
+  name: "center_lossAR"
+  type: "CenterLoss"
+  bottom: "fc5"
+  bottom: "label"
+  top: "center_loss"
+  param {
+    lr_mult: 1
+    decay_mult: 2 
+  }
+  center_loss_param {
+    num_output: 15 # 10575
+    center_filler {
+      type: "xavier"
+    }
+  }
+  loss_weight: 0.01
+}

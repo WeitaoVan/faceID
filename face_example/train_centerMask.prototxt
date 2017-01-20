@@ -1,15 +1,11 @@
 #
-
-###########     NOTE: may need to change                           #########
-###########	      'num_output' for fc6 and center_loss and     ###############
-###########	      'name' for fc6 and center_loss               ##########
 name: "Face-ResNet"
 layer {
   name: "data"
   type: "ImageData"
   top: "data"
   top: "label"
-  include { 
+  include { 																																																																																																														
     phase: TRAIN
   }
   transform_param {
@@ -20,11 +16,11 @@ layer {
     mirror: true
   }
   image_data_param {
-    root_folder: "/media/wwt/860G/data/"
-    source: "face_example/data/train_AR_ID2.txt"
-    batch_size: 160 
+    root_folder: "/media/wwt/860G/data/CASIA_aligned/"
+    source: "face_example/data/CASIA_aligned.txt"
+    batch_size: 192 
     shuffle: true
-    is_color: true
+    is_color: true # color or gray
   }
 }
 ## test unused for now
@@ -49,10 +45,124 @@ layer {
     shuffle: true
   }
 }
+
+# MaskNet
+layer {
+  name: "mask_conv1"
+  type: "Convolution"
+  bottom: "data"
+  top: "mask_conv1"
+  param {
+    name: "mask_conv1_w"
+    lr_mult: 0
+  }
+  param {
+    name: "mask_conv1_b"
+    lr_mult: 0
+  }
+  convolution_param {
+    num_output: 64
+    kernel_size: 5
+    stride: 1
+    pad: 2
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "mask_relu1"
+  type: "PReLU"
+  bottom: "mask_conv1"
+  top: "mask_conv1"
+}
+
+layer {
+  name: "mask_conv2"
+  type: "Convolution"
+  bottom: "mask_conv1"
+  top: "mask_conv2"
+  param {
+    name: "mask_conv2_w"
+    lr_mult: 0
+  }
+  param {
+    name: "mask_conv2_b"
+    lr_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    kernel_size: 3
+    stride: 1
+    pad: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "mask_relu2"
+  type: "PReLU"
+  bottom: "mask_conv2"
+  top: "mask_conv2"
+}
+
+layer {
+  name: "mask_conv3"
+  type: "Convolution"
+  bottom: "mask_conv2"
+  top: "mask_conv3"
+  param {
+    name: "mask_conv3_w"
+    lr_mult: 1
+  }
+  param {
+    name: "mask_conv3_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 3
+    kernel_size: 3
+    stride: 1
+    pad: 1
+    weight_filler {
+      type: "constant"
+    }
+    bias_filler {
+      type: "constant"
+      value: 1
+    }
+  }
+}
+layer {
+  name: "sig3"
+  type: "Sigmoid"
+  bottom: "mask_conv3"
+  top: "mask_conv3"
+}
+layer {
+  name: "mask"
+  type: "Eltwise"
+  bottom: "data"
+  bottom: "mask_conv3"
+  top: "mask_data"
+  eltwise_param {
+    operation: PROD
+  }
+}
+
+
+
 layer {
   name: "conv1a"
   type: "Convolution"
-  bottom: "data"
+  bottom: "mask_data"
   top: "conv1a"
   param {
     lr_mult: 1
@@ -1138,7 +1248,7 @@ layer {
 }
 ############## softmax loss ###############
 layer {
-  name: "fc6AR"
+  name: "fc6"
   type: "InnerProduct"
   bottom: "fc5"
   top: "fc6"
@@ -1151,7 +1261,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 135
+    num_output: 10575
     weight_filler {
       type: "xavier"
     }
@@ -1170,7 +1280,7 @@ layer {
 }
 ############## center loss ###############
 layer {
-  name: "center_lossAR"
+  name: "center_loss"
   type: "CenterLoss"
   bottom: "fc5"
   bottom: "label"
@@ -1180,10 +1290,10 @@ layer {
     decay_mult: 2 
   }
   center_loss_param {
-    num_output: 135
+    num_output: 10575
     center_filler {
       type: "xavier"
     }
   }
-  loss_weight: 0.05
+  loss_weight: 0.008
 }

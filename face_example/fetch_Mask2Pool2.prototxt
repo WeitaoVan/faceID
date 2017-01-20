@@ -1,0 +1,175 @@
+#
+name: "Face-ResNet"
+layer {
+  name: "data"
+  type: "ImageData"
+  top: "data"
+  top: "label"
+  include {
+    phase: TRAIN
+  }
+  transform_param {
+    scale: 0.0078125
+    mirror: true
+    mean_value: 127.5
+    mean_value: 127.5
+    mean_value: 127.5
+  }
+  image_data_param {
+    source: "/home/wwt/caffe_centerFace/face_example/data/train_AR_ID.txt"
+    #source: "/home/wwt/caffe_centerFace/face_example/data/train_CASIA_half_simOcc.txt"
+    batch_size: 1
+    shuffle: true
+    is_color: true
+    root_folder: "/media/wwt/860G/data/"
+  }
+}
+layer {
+  name: "data"
+  type: "ImageData"
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+  }
+  transform_param {
+    scale: 0.0078125
+    mirror: true
+    mean_value: 127.5
+    mean_value: 127.5
+    mean_value: 127.5
+  }
+  image_data_param {
+    source: "/home/wwt/caffe_centerFace/face_example/data/val_CASIA_aligned.txt"
+    batch_size: 47
+    root_folder: "/media/wwt/860G/data/"
+  }
+}
+
+layer {
+  name: "mask_conv1"
+  type: "Convolution"
+  bottom: "data"
+  top: "mask_conv1"
+  param {
+    name: "mask_conv1_w"
+    lr_mult: 1
+  }
+  param {
+    name: "mask_conv1_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 20 #64
+    kernel_size: 5
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "mask_pool1"
+  type: "Pooling"
+  bottom: "mask_conv1"
+  top: "mask_pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "mask_relu1"
+  type: "ReLU"
+  bottom: "mask_pool1"
+  top: "mask_pool1"
+}
+layer {
+  name: "mask_conv2"
+  type: "Convolution"
+  bottom: "mask_pool1"
+  top: "mask_conv2"
+  param {
+    name: "mask_conv2_w"
+    lr_mult: 1
+  }
+  param {
+    name: "mask_conv2_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 32 #128
+    kernel_size: 5 #3
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "mask_pool2"
+  type: "Pooling"
+  bottom: "mask_conv2"
+  top: "mask_pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "mask_relu2"
+  type: "ReLU"
+  bottom: "mask_pool2"
+  top: "mask_pool2"
+}
+layer {
+  name: "mask_ip"
+  type: "InnerProduct"
+  bottom: "mask_pool2"
+  top: "mask_ip"
+  param {
+    name: "mask_ip_w"
+    lr_mult: 1
+  }
+  param {
+    name: "mask_ip_b"
+    lr_mult: 2
+  }
+  inner_product_param {
+    num_output: 572
+    weight_filler {
+      type: "constant"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "distribution"
+  type: "Sigmoid"
+  bottom: "mask_ip"
+  top: "distribution"
+}
+layer {
+  name: "mask_2d"
+  type: "Reshape"
+  bottom: "distribution"
+  top: "mask_2d"
+  reshape_param {
+    shape {
+      dim: 0
+      dim: 1
+      dim: 26
+      dim: -1
+    }
+  }
+}

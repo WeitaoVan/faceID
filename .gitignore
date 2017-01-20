@@ -96,3 +96,9 @@ LOCK
 LOG*
 CURRENT
 MANIFEST-*
+
+#custom
+*.log
+*.out
+log/*
+log*

@@ -1,5 +1,5 @@
-net: "face_example/train_angle.prototxt"
-#net: "/home/wwt/caffe_centerFace/face_example/train_centerMask2Pool2_ori.prototxt"
+#net: "face_example/train_angle.prototxt"
+net: "/home/wwt/caffe_centerFace/face_example/train_centerMask2Pool2_ori.prototxt"
 #net: "/home/wwt/caffe_centerFace/face_example/fetch_fc6_centerloss.prototxt"
 test_iter: 83 # 433 #  273
 test_interval: 2000
@@ -16,7 +16,7 @@ display: 100
 momentum: 0.9
 weight_decay: 0.0005
 snapshot: 1000
-snapshot_prefix: "/media/wwt/860G/model/face/angle_share"
+snapshot_prefix: "/media/wwt/860G/model/face/mask2pool2"
 
 solver_mode: GPU
 #clip_gradients: 16

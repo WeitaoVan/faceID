@@ -19,6 +19,10 @@ Our network architecture
 
 ![Picture](https://github.com/WeitaoVan/faceID/blob/MaskNet/image/structure.jpg)
 
+The generated masks on faces with occlusion
+
+![Picture](https://github.com/WeitaoVan/faceID/blob/MaskNet/image/mask.jpg)
+
 ### Files
 - Caffe with center loss imported from https://github.com/ydwen/caffe-face
 - Mask Layer

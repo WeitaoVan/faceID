@@ -7,7 +7,7 @@ This branch is developed for face recognition with occlusion, the related paper 
     2017 IEEE International Conference on Image Processing (ICIP)
 
 * [Architecture](#Architecture)
-* 
+* [Results](#Results)
 * [Files](#files)
 * [Train_Model](#train_model)
 * [Contact](#contact)

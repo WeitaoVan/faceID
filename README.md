@@ -3,10 +3,11 @@
 This branch is developed for face recognition with occlusion, the related paper is as follows.
     
     OCCLUSION ROBUST FACE RECOGNITION BASED ON MASK LEARNING[C]
-    Weitao, Wan and Jiansheng Chen
+    Weitao, Wan and Jiansheng, Chen
     2017 IEEE International Conference on Image Processing (ICIP)
 
 * [Architecture](#Architecture)
+* 
 * [Files](#files)
 * [Train_Model](#train_model)
 * [Contact](#contact)
@@ -19,9 +20,14 @@ Our network architecture
 
 ![Picture](https://github.com/WeitaoVan/faceID/blob/MaskNet/image/structure.jpg)
 
+### Results
 The generated masks on faces with occlusion
 
 ![Picture](https://github.com/WeitaoVan/faceID/blob/MaskNet/image/mask.jpg)
+
+Face verification on lfw validation set with synthesized square blocks with varying sizes.
+
+![Picture](https://github.com/WeitaoVan/faceID/blob/MaskNet/image/Verification_Acc.jpg)
 
 ### Files
 - Caffe with center loss imported from https://github.com/ydwen/caffe-face

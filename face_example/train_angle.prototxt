@@ -2,7 +2,7 @@
 name: "Face-ResNet"
 layer {
   name: "data"
-  type: "ImageData"
+  type: "Data"
   top: "data"
   top: "label"
   include { 
@@ -15,18 +15,20 @@ layer {
     scale: 0.0078125
     mirror: true
   }
-  image_data_param {
-    root_folder: "/media/wwt/860G/data/"
-    source: "face_example/data/train_CASIA_aligned.txt"
+  data_param {
+    #root_folder: "/media/wwt/860G/data/"
+    #source: "face_example/data/train_CASIA_aligned.txt"
+    source: "/media/wwt/860G/data/lmdb/CASIA_train_lmdb"
+    backend: LMDB
     batch_size: 160 
-    shuffle: true
-    is_color: true
+    #shuffle: true
+    #is_color: true
   }
 }
 ## test unused for now
 layer {
   name: "data"
-  type: "ImageData"
+  type: "Data"
   top: "data"
   top: "label"
   include {
@@ -39,10 +41,12 @@ layer {
     scale: 0.0078125
     mirror: true
   }
-  image_data_param {
-    source: "face_example/data/val_CASIA_aligned.txt"
-    root_folder: "/media/wwt/860G/data/"
-    batch_size: 141
+  data_param {
+    #source: "face_example/data/val_CASIA_aligned.txt"
+    source: "/media/wwt/860G/data/lmdb/CASIA_val_lmdb"
+    backend: LMDB
+    #root_folder: "/media/wwt/860G/data/"
+    batch_size: 128
   }
 }
 layer {
@@ -1139,6 +1143,7 @@ layer {
   bottom: "fc5"
   top: "fc6"
   param {
+    name: "centerVec"
     lr_mult: 1
     decay_mult: 1
   }
@@ -1172,8 +1177,9 @@ layer {
   bottom: "label"
   top: "angle_loss"
   param {
+    name: "centerVec"
     lr_mult: 1
-    decay_mult: 2
+    decay_mult: 1
   }
   angle_loss_param {
     num_output: 10575
@@ -1181,5 +1187,5 @@ layer {
       type: "xavier"
     }
   }
-  loss_weight: 0.001
+  loss_weight: 1
 }

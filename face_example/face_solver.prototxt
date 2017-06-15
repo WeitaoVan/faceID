@@ -1,22 +1,22 @@
-#net: "face_example/face_train_test.prototxt"
-net: "/home/wwt/caffe_centerFace/face_example/train_centerMask2Pool2_ori.prototxt"
-#net: "/home/wwt/caffe_centerFace/face_example/fetch_my.prototxt"
-#test_iter: 433 #  273
-#test_interval: 2000
+net: "face_example/train_angle.prototxt"
+#net: "/home/wwt/caffe_centerFace/face_example/train_centerMask2Pool2_ori.prototxt"
+#net: "/home/wwt/caffe_centerFace/face_example/fetch_fc6_centerloss.prototxt"
+test_iter: 83 # 433 #  273
+test_interval: 2000
 
-base_lr: 0.02
+base_lr: 0.05
 lr_policy: "multistep"
 gamma: 0.1
 
-stepvalue: 500
-#stepvalue: 36000
-max_iter: 1000
+stepvalue: 20000
+stepvalue: 36000
+max_iter: 40000
 
-display: 10
+display: 100
 momentum: 0.9
 weight_decay: 0.0005
-snapshot: 200
-snapshot_prefix: "/media/wwt/860G/model/face/centerMask2Pool2_ID0_noFt"
+snapshot: 1000
+snapshot_prefix: "/media/wwt/860G/model/face/angle_share"
 
 solver_mode: GPU
-#clip_gradients: 128
+#clip_gradients: 16

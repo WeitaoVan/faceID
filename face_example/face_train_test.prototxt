@@ -21,13 +21,12 @@ layer {
   }
   image_data_param {
     root_folder: "/media/wwt/860G/data/"
-    source: "face_example/data/train_AR_ID2.txt"
+    source: "face_example/data/train_CASIA_aligned.txt"
     batch_size: 160 
     shuffle: true
     is_color: true
   }
 }
-## test unused for now
 layer {
   name: "data"
   type: "ImageData"
@@ -44,7 +43,8 @@ layer {
     mirror: true
   }
   image_data_param {
-    source: "face_example/data/val.txt"
+    root_folder: "/media/wwt/860G/data/"
+    source: "face_example/data/val_CASIA_aligned.txt"
     batch_size: 128
     shuffle: true
   }
@@ -1138,20 +1138,20 @@ layer {
 }
 ############## softmax loss ###############
 layer {
-  name: "fc6AR"
+  name: "fc6"
   type: "InnerProduct"
   bottom: "fc5"
   top: "fc6"
   param {
-    lr_mult: 1
+    lr_mult: 1 # 1 # 
     decay_mult: 1
   }
   param {
-    lr_mult: 2
+    lr_mult: 2 # 2 # 
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 135
+    num_output: 10575
     weight_filler {
       type: "xavier"
     }
@@ -1170,20 +1170,20 @@ layer {
 }
 ############## center loss ###############
 layer {
-  name: "center_lossAR"
+  name: "center_loss"
   type: "CenterLoss"
   bottom: "fc5"
   bottom: "label"
   top: "center_loss"
   param {
-    lr_mult: 1
-    decay_mult: 2 
+    lr_mult: 1 # 1
+    decay_mult: 2 # 2
   }
   center_loss_param {
-    num_output: 135
+    num_output: 10575
     center_filler {
       type: "xavier"
     }
   }
-  loss_weight: 0.05
+  loss_weight: 0.008
 }

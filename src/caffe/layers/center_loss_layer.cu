@@ -66,6 +66,11 @@ void CenterLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
   if (propagate_down[0]) {
     caffe_gpu_scale(M_ * K_, top[0]->cpu_diff()[0] / M_, 
                              distance_.gpu_data(), bottom[0]->mutable_gpu_diff());
+    if(0){
+      for(int i = 0; i < 4; i++){
+	LOG(INFO) << "bottom_diff[" << i << "]=" << bottom[0]->cpu_diff()[i];
+      }
+    }
   }
   if (propagate_down[1]) {
     LOG(FATAL) << this->type()

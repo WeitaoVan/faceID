@@ -36,7 +36,7 @@ __global__ void Compute_center_diff_gpu(int nthreads, const int M, const int K, 
     	  Dtype C = cross_term * cross_term;
     	  Dtype E = dotx[m] * (dotb[m] - b_val * b_val);
           center_diff[idx_b] += Dtype(-1.0) * ((Dtype(-1.0)*D*B*b_val*b_val + 2*(A*E - C*D)*b_val + B*E)
-				                    / (dotx[m] * dotx[m] * dotb[m] * dotb[m]  + 1e-8));
+				                    / (dotx[m] * dotx[m] * dotb[m] * pow(dotb[m], Dtype(0.25))  + 1e-8));
         }
       }
     }
@@ -65,7 +65,7 @@ __global__ void Compute_bottom_diff_gpu(int nthreads, int K, const Dtype* x,
     Dtype D = dotb[m];
     Dtype E = dotb[m] * (dotx[m] - x_val * x_val);
     bottom_diff[index] = Dtype(-1.0) * ((Dtype(-1.0)*D*B*x_val*x_val + 2*(A*E - C*D)*x_val + B*E)
-                            / (dotx[m] * dotx[m] * dotb[m] * dotb[m] + 1e-8));
+                            / (dotx[m] * pow(dotx[m], Dtype(0.25)) * dotb[m] * dotb[m] + 1e-8));
   }
 }
 
@@ -87,7 +87,7 @@ void AngleLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
 	}
 	dotxb.mutable_cpu_data()[i] = tmp;
 	caffe_gpu_dot(K_, px, px, &tmp);
-	if(1){
+	if(0){
 		//LOG(INFO) << "dotx = " << tmp;
 		mean_x_sq += tmp;
 	}
@@ -99,7 +99,7 @@ void AngleLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
 		LOG(INFO) << " ";
 	}
   }
-  if(1){
+  if(0){
 	LOG(INFO) << "mean of dotx=" << mean_x_sq / Dtype(M_);
   }
   Compute_loss_gpu<Dtype><<<CAFFE_GET_BLOCKS(M_),
@@ -121,22 +121,25 @@ void AngleLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
   Dtype* blob_diff = this->blobs_[0]->mutable_gpu_diff();
   caffe_gpu_set(N_ * K_, (Dtype)0., blob_diff);
   // diff for center parameters (i.e. b)
+  bool diff_to_center = false;
+  if(diff_to_center){
   Compute_center_diff_gpu<Dtype><<<CAFFE_GET_BLOCKS(nthreads),
       CAFFE_CUDA_NUM_THREADS>>>(nthreads, M_, K_, x, b, bottom[1]->gpu_data(), dotxb.gpu_data(), dotx.gpu_data(),
                                 dotb.gpu_data(), blob_diff);
   caffe_gpu_scal(N_ * K_, Dtype(0.1), blob_diff);
+  }
   if (propagate_down[0]) {
   // diff for bottom[0]
     Compute_bottom_diff_gpu<Dtype><<<CAFFE_GET_BLOCKS(M_ * K_),
         CAFFE_CUDA_NUM_THREADS>>>(M_ * K_, K_, x, b, bottom[1]->gpu_data(), dotxb.gpu_data(), dotx.gpu_data(),
                                   dotb.gpu_data(), bottom[0]->mutable_gpu_diff());
     caffe_gpu_scal(M_ * K_, top[0]->cpu_diff()[0] / M_, bottom[0]->mutable_gpu_diff());
-    if(1){ //DEBUG
+    if(0){ //DEBUG
 	for(int i = 0; i < 4; i++){
 		LOG(INFO) << "bottom_diff[" << i << "]=" << bottom[0]->cpu_diff()[i];
 	}
 	int label_value = bottom[1]->cpu_data()[0];
-	for(int i = 0; i < 4; i++){
+	for(int i = 0; i < 0; i++){
 		LOG(INFO) << "center_diff[" << i << "]=" << this->blobs_[0]->cpu_diff()[label_value * K_ + i];
 	}
     }

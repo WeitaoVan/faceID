@@ -1,6 +1,6 @@
 # Deep Face Recognition with Caffe Implementation
 
-This branch is developed for deep face recognition, the related paper is as follows.
+This branch is developed for face recognition with occlusion, the related paper is as follows.
     
     OCCLUSION ROBUST FACE RECOGNITION BASED ON MASK LEARNING[C]
     Weitao, Wan and Jiansheng Chen
@@ -9,11 +9,15 @@ This branch is developed for deep face recognition, the related paper is as foll
 
 * [Files](#files)
 * [Train_Model](#train_model)
-* [Extract_DeepFeature](#extract_deepfeature)
 * [Contact](#contact)
 * [Citation](#citation)
 * [LICENSE](#license)
 * [README_Caffe](#readme_caffe)
+
+### Architecture
+Our network architecture 
+
+![Picture](https://github.com/WeitaoVan/faceID/blob/MaskNet/image/structure.jpg)
 
 ### Files
 - Caffe with center loss imported from https://github.com/ydwen/caffe-face
@@ -28,7 +32,7 @@ This branch is developed for deep face recognition, the related paper is as foll
 ### Train_Model
 1. Specify your mask size in 'num_output' (the value should equal to height x width of the mask)
 
-		'''
+		
 		layer {
 		  name: "mask_ip"
 		  type: "InnerProduct"
@@ -52,10 +56,10 @@ This branch is developed for deep face recognition, the related paper is as foll
 		    }
 		  }
 		}
-		'''
+		
 2. Choose the location to insert the mask layer. I placed it after 'pool2'.
 
-		'''
+		
 		layer {
 		  name: "mask"
 		  type: "Mask"
@@ -66,10 +70,10 @@ This branch is developed for deep face recognition, the related paper is as foll
 		    scale: 1
 		  }
 		}
-		'''
+		
 
 ### Contact 
-- [Weitao Wan](wwt16@mails.tsinghua.edu.cn)
+Weitao Wan(wwt16@mails.tsinghua.edu.cn)
 
 ### Citation
 Please consider citing the following paper if it helps your research. 

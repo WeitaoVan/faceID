@@ -6,7 +6,7 @@ This branch is developed for face recognition with occlusion, the related paper 
     Weitao, Wan and Jiansheng Chen
     2017 IEEE International Conference on Image Processing (ICIP)
 
-
+* [Architecture](#Architecture)
 * [Files](#files)
 * [Train_Model](#train_model)
 * [Contact](#contact)

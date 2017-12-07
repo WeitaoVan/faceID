@@ -20,7 +20,7 @@ The paper can be downloaded from https://pan.baidu.com/s/1qXEr5KC
 ### Architecture
 Our network architecture 
 
-![Picture](https://github.com/WeitaoVan/faceID/blob/MaskNet/image/structure.jpg)
+<img src="https://github.com/WeitaoVan/faceID/blob/MaskNet/image/structure.jpg" widdth="512">
 
 ### Results
 The generated masks on faces with occlusion

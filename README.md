@@ -29,7 +29,7 @@ The generated masks on faces with occlusion
 
 Face verification on lfw validation set with synthesized square blocks with varying sizes.
 
-![Picture](https://github.com/WeitaoVan/faceID/blob/MaskNet/image/Verification_Acc.jpg)
+<img src="https://github.com/WeitaoVan/faceID/blob/MaskNet/image/Verification_Acc.jpg" width="256">
 
 ### Files
 - Caffe with center loss imported from https://github.com/ydwen/caffe-face

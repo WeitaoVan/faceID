@@ -25,7 +25,7 @@ Our network architecture
 ### Results
 The generated masks on faces with occlusion
 
-<img src="https://github.com/WeitaoVan/faceID/blob/MaskNet/image/mask.jpg" width="48">
+<img src="https://github.com/WeitaoVan/faceID/blob/MaskNet/image/mask.jpg" width="512">
 
 Face verification on lfw validation set with synthesized square blocks with varying sizes.
 

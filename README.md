@@ -20,7 +20,7 @@ The paper can be downloaded from https://pan.baidu.com/s/1qXEr5KC
 ### Architecture
 Our network architecture 
 
-<img src="https://github.com/WeitaoVan/faceID/blob/MaskNet/image/structure.jpg" widdth="512">
+<img src="https://github.com/WeitaoVan/faceID/blob/MaskNet/image/structure.jpg" widdth="256">
 
 ### Results
 The generated masks on faces with occlusion
@@ -29,7 +29,7 @@ The generated masks on faces with occlusion
 
 Face verification on lfw validation set with synthesized square blocks with varying sizes.
 
-<img src="https://github.com/WeitaoVan/faceID/blob/MaskNet/image/Verification_Acc.jpg" width="256">
+<img src="https://github.com/WeitaoVan/faceID/blob/MaskNet/image/Verification_Acc.jpg" width="512">
 
 ### Files
 - Caffe with center loss imported from https://github.com/ydwen/caffe-face

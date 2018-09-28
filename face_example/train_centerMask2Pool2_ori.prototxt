@@ -1312,7 +1312,7 @@ layer {
     num_output: 120
     weight_filler {
       type: "xavier"
-    x`}
+    }
     bias_filler {
       type: "constant"
       value: 0
